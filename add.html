@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product CRUD with Local Storage</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    #productForm{
+        width:500px;
+        padding:50px;
+        margin-left: 500px;;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background-color: rgb(47, 26, 238);
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+      width:500px;
+    }
+    li img {
+      width: 100px;
+      height: 100px;
+      border-radius: 5px;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+    .actions {
+      margin-top: 10px;
+    }
+   
+  </style>
+</head>
+<body>
+  <h1>Product CRUD with Local Storage</h1>
+  
+  <form id="productForm">
+    <label for="productName">Product Name:</label>
+    <input type="text" id="productName" required>
+    <br>
+    <label for="productPrice">Product Price:</label>
+    <input type="number" id="productPrice" required>
+    <br>
+    <label for="productDescription">Product Description:</label>
+    <textarea id="productDescription" required></textarea>
+    <br>
+    <label for="productImage">Product Image URL:</label>
+    <input type="text" id="productImage" required>
+    <br>
+    <button type="submit" id="submit">Add Product</button>
+  </form>
+  
+  <ul id="product List"></ul>
+
+  <script>
+   
+
+    const productForm = document.getElementById('productForm');
+    const productList = document.getElementById('productList');
+
+    function fetchProducts() {
+      const products = JSON.parse(localStorage.getItem('products')) || [];
+      displayProducts(products);
+    }
+
+    function displayProducts(products) {
+      productList.innerHTML = products.map((product, index) => `
+        <li>
+          <strong>${product.name}</strong><br>
+          <p><strong>$${product.price}</strong></p>
+          <p>${product.description}</p>
+          <img src="${product.image}" alt="${product.name}" width="100">
+          <button onclick="editProduct(${index})">Edit</button>
+          <button onclick="deleteProduct(${index})">Delete</button>
+        </li>
+      `).join('');
+    }
+
+    function addProduct(event) {
+      event.preventDefault();
+      const productName = document.getElementById('productName').value;
+      const productPrice = parseFloat(document.getElementById('productPrice').value);
+      const productDescription = document.getElementById('productDescription').value;
+      const productImage = document.getElementById('productImage').value;
+
+      if (productName.trim() !== '' && !isNaN(productPrice) && productDescription.trim() !== '' && productImage.trim() !== '') {
+        const products = JSON.parse(localStorage.getItem('products')) || [];
+        products.push({
+          name: productName,
+          price: productPrice,
+          description: productDescription,
+          image: productImage
+        });
+        localStorage.setItem('products', JSON.stringify(products));
+        fetchProducts();
+        productForm.reset();
+
+      } else {
+        alert('Please fill in all fields correctly.');
+      }
+    }
+
+    function editProduct(index) {
+      const products = JSON.parse(localStorage.getItem('products')) || [];
+      const newName = prompt('Enter a new name for the product:', products[index].name);
+      const newPrice = parseFloat(prompt('Enter a new price for the product:', products[index].price));
+      const newDescription = prompt('Enter a new description for the product:', products[index].description);
+      const newImage = prompt('Enter a new image URL for the product:', products[index].image);
+
+      if (newName !== null && !isNaN(newPrice) && newDescription !== null && newImage !== null) {
+        products[index] = {
+          name: newName,
+          price: newPrice,
+          description: newDescription,
+          image: newImage
+        };
+        localStorage.setItem('products', JSON.stringify(products));
+        fetchProducts();
+      }
+    }
+
+    function deleteProduct(index) {
+      const products = JSON.parse(localStorage.getItem('products')) || [];
+      products.splice(index, 1);
+      localStorage.setItem('products', JSON.stringify(products));
+      fetchProducts();
+    }
+
+
+
+    productForm.addEventListener('submit', addProduct);
+    fetchProducts();
+  </script>
+</body>
+</html>

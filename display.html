@@ -1,0 +1,118 @@
+<!-- Contents of display_products.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Display Products</title>
+  <!-- Your CSS styles -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    ul {
+      list-style: none;
+      padding: 10px;
+      width:900px;
+    }
+    li {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    li img {
+      width: 100px;
+      height: 100px;
+      border-radius: 5px;
+      object-fit: cover;
+      margin-right: 20px;
+    }
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Added Products</h1>
+  
+  <ul id="addedProductList"></ul>
+
+  <script>
+    // Function to fetch products from localStorage
+    function fetchProducts() {
+      const products = JSON.parse(localStorage.getItem('products')) || [];
+      displayProducts(products);
+    }
+
+    // Function to display products in the list
+    function displayProducts(products) {
+      const addedProductList = document.getElementById('addedProductList');
+      addedProductList.innerHTML = products.map((product, index) => `
+      <li>
+          <div>
+            <strong>${product.name}</strong>
+            <p><strong>$${product.price}</strong></p>
+          </div>
+          <div>
+          <p>${product.description}</p>
+          </div>
+          <img src="${product.image}" alt="${product.name}" width="100">
+          <button onclick="editProduct(${index})">Edit</button>
+          <button onclick="deleteProduct(${index})">Delete</button>
+        </li>
+      `).join('');
+    }
+
+    // Function to edit a product
+    function editProduct(index) {
+      const products = JSON.parse(localStorage.getItem('products')) || [];
+      const newName = prompt('Enter a new name for the product:', products[index].name);
+      const newPrice = parseFloat(prompt('Enter a new price for the product:', products[index].price));
+      const newDescription = prompt('Enter a new description for the product:', products[index].description);
+      const newImage = prompt('Enter a new image URL for the product:', products[index].image);
+
+      if (newName !== null && !isNaN(newPrice) && newDescription !== null && newImage !== null) {
+        products[index] = {
+          name: newName,
+          price: newPrice,
+          description: newDescription,
+          image: newImage
+        };
+        localStorage.setItem('products', JSON.stringify(products));
+        fetchProducts();
+      }
+    }
+
+    // Function to delete a product
+    function deleteProduct(index) {
+      const products = JSON.parse(localStorage.getItem('products')) || [];
+      products.splice(index, 1);
+      localStorage.setItem('products', JSON.stringify(products));
+      fetchProducts();
+    }
+
+    // Fetch and display products when the page loads
+    fetchProducts();
+  </script>
+</body>
+</html>
